@@ -7,6 +7,8 @@
 //
 
 #import "ZViewController.h"
+#import "CURLDemo.h"
+
 
 @interface ZViewController ()
 
@@ -18,12 +20,21 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    
+    [self testCURL];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+- (void)testCURL {
+    CURLDemo *demo = [[CURLDemo alloc] init];
+    
+    [demo curl:@"https://lzackx.com"];
 }
 
 @end

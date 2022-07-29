@@ -1,20 +1,25 @@
 PODS:
-  - ZAPM (1.0.0):
-    - ZAPM/Core (= 1.0.0)
   - ZAPM/Core (1.0.0)
+  - ZAPM/Network (1.0.0):
+    - ZAPM/Core
+    - Zcurl
+  - Zcurl (7.83.1)
 
 DEPENDENCIES:
-  - ZAPM (from `../`)
+  - ZAPM/Network (from `../`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Zcurl
 
 EXTERNAL SOURCES:
   ZAPM:
     :path: "../"
-    :subspec:
-      - Network
 
 SPEC CHECKSUMS:
   ZAPM: 5eee8a57e66edbbbe494d4ab488fcca4f56c8cab
+  Zcurl: a01682a83173c3ab3fc5a6e30333f4386e26a6ed
 
-PODFILE CHECKSUM: a23683a4adac10ca3bc227d706474fb7fa6a88e6
+PODFILE CHECKSUM: 94ef4b524cbc9119f4e40a2456873af1bbfe1497
 
 COCOAPODS: 1.11.3
