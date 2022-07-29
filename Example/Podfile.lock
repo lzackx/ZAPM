@@ -1,0 +1,20 @@
+PODS:
+  - ZAPM (1.0.0):
+    - ZAPM/Core (= 1.0.0)
+  - ZAPM/Core (1.0.0)
+
+DEPENDENCIES:
+  - ZAPM (from `../`)
+
+EXTERNAL SOURCES:
+  ZAPM:
+    :path: "../"
+    :subspec:
+      - Network
+
+SPEC CHECKSUMS:
+  ZAPM: 5eee8a57e66edbbbe494d4ab488fcca4f56c8cab
+
+PODFILE CHECKSUM: a23683a4adac10ca3bc227d706474fb7fa6a88e6
+
+COCOAPODS: 1.11.3

@@ -1,9 +1,12 @@
+source 'https://github.com/CocoaPods/Specs'
+
 use_frameworks!
 
 platform :ios, '10.0'
 
+
 target 'ZAPM_Example' do
-  pod 'ZAPM', :path => '../'
+  pod 'ZAPM', :subspecs => ['Network'], :path => '../'
 
   target 'ZAPM_Tests' do
     inherit! :search_paths
