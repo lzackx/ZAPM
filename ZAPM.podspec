@@ -19,6 +19,7 @@ APM implementation.
   s.source = { :git => "https://github.com/lZackx/ZAPM.git", :tag => s.version.to_s }
   s.ios.deployment_target = "9.0"
   s.default_subspecs = 'Core'
+
   s.subspec "Core" do |ss|
     ss.source_files = "ZAPM/Classes/Core/**/*"
   end
@@ -26,6 +27,6 @@ APM implementation.
   s.subspec "Network" do |ss|
     ss.source_files = "ZAPM/Classes/Network/**/*"
     ss.dependency "ZAPM/Core"
-    ss.dependency "Zcurl"
+    ss.dependency "Zcurl", '1.0.0'
   end
 end
