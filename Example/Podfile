@@ -1,4 +1,5 @@
 source 'https://github.com/CocoaPods/Specs'
+source 'git@github.com:lzackx/zpod.git'
 
 use_frameworks! :linkage => :static
 

@@ -22,11 +22,15 @@ APM implementation.
 
   s.subspec "Core" do |ss|
     ss.source_files = "ZAPM/Classes/Core/**/*"
+    ss.dependency "YYModel"
   end
 
   s.subspec "Network" do |ss|
-    ss.source_files = "ZAPM/Classes/Network/**/*"
+    ss.source_files = [
+      "ZAPM/Classes/Network/**/*",
+    ]
     ss.dependency "ZAPM/Core"
-    ss.dependency "Zcurl", '1.0.0'
+    ss.dependency "Zcurl"
+    ss.dependency "ZNetDiagnosis"
   end
 end

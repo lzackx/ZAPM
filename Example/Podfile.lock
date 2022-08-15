@@ -1,15 +1,36 @@
 PODS:
-  - ZAPM/Core (1.0.0)
+  - YYModel (1.0.4)
+  - ZAPM/Core (1.0.0):
+    - YYModel
   - ZAPM/Network (1.0.0):
     - ZAPM/Core
-    - Zcurl (= 1.0.0)
-  - Zcurl (1.0.0)
+    - Zcurl
+    - ZNetDiagnosis
+  - Zcurl (7.83.1.1)
+  - ZNetDiagnosis (1.0.0):
+    - ZNetDiagnosis/All (= 1.0.0)
+  - ZNetDiagnosis/All (1.0.0):
+    - ZNetDiagnosis/Core
+    - ZNetDiagnosis/DNS
+    - ZNetDiagnosis/Ping
+    - ZNetDiagnosis/Traceroute
+  - ZNetDiagnosis/Core (1.0.0)
+  - ZNetDiagnosis/DNS (1.0.0):
+    - ZNetDiagnosis/Core
+  - ZNetDiagnosis/Ping (1.0.0):
+    - ZNetDiagnosis/Core
+  - ZNetDiagnosis/Traceroute (1.0.0):
+    - ZNetDiagnosis/Core
+    - ZNetDiagnosis/DNS
 
 DEPENDENCIES:
   - ZAPM/Network (from `../`)
 
 SPEC REPOS:
+  "git@github.com:lzackx/zpod.git":
+    - ZNetDiagnosis
   https://github.com/CocoaPods/Specs.git:
+    - YYModel
     - Zcurl
 
 EXTERNAL SOURCES:
@@ -17,9 +38,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ZAPM: ec6166ba2fcf0299955ec98c3c81db3dd324d5ba
-  Zcurl: f57c3f1ec42e96863ec1ec61e64178204f4877f1
+  YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
+  ZAPM: d7a940d615b1382b196f08ab7c01035cbbe51524
+  Zcurl: 3c5d31aa9b06055489db4be1cb19232ba2f50551
+  ZNetDiagnosis: e1cae45cf9ea1fee93d8ff702abdf92fecc438b6
 
-PODFILE CHECKSUM: 57f34799f88be68da42a01d15ba57f664cfa6262
+PODFILE CHECKSUM: 77e18429be7e0f7db9a476bc2e89855c26c98c37
 
 COCOAPODS: 1.11.3
