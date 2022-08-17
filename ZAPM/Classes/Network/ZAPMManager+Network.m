@@ -11,7 +11,111 @@
 #import <objc/runtime.h>
 #import <ZNetDiagnosis/ZNDTracerouteICMPReceiveModel.h>
 
+#import <ZNetDiagnosis/ZNetDiagnosis+dns.h>
+#import <ZNetDiagnosis/ZNetDiagnosis+ping.h>
+#import <ZNetDiagnosis/ZNetDiagnosis+traceroute.h>
+
+#import <YYModel/YYModel.h>
+
 @implementation ZAPMManager (Network)
+
+// MARK: - Joint trace
+- (void)traceWithTarget:(NSArray<NSString *> *)targets
+             completion:(void(^)(NSDictionary *info))completion {
+    ZAPMLog(@"%s", __FUNCTION__);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        for (NSString *target in targets) {
+            // DNS
+            NSString *ip = [[[ZNetDiagnosis shared] ipsForDomainName:target] firstObject];
+            if (ip == nil) {
+                return;
+            }
+            ZAPMLog(@"trace target: %@", target);
+            __block NSMutableDictionary *traceInfo = [NSMutableDictionary dictionary];
+            [traceInfo setValue:target forKey:@"domain"];
+            [traceInfo setValue:ip forKey:@"ip"];
+            
+            // Ping
+            ZNDPingConfiguration *pingConfiguration = [[ZNDPingConfiguration alloc] init];
+            pingConfiguration.target = ip;
+            pingConfiguration.attempt = 4;
+            pingConfiguration.timeout = 1;
+            __block NSMutableArray *durations = [NSMutableArray array];
+            [[ZNetDiagnosis shared] pingWithConfiguration:pingConfiguration success:^(NSDictionary * _Nonnull info) {
+                ZAPMLog(@"ping s ==== %@: %@", traceInfo[@"domain"], info);
+                if ([info objectForKey:@"duration"]) {
+                    NSNumber *d = [info objectForKey:@"duration"];
+                    [durations addObject:@((NSInteger)([d doubleValue] * 1000))];
+                }
+            } failure:^(NSDictionary * _Nonnull info) {
+                ZAPMLog(@"ping f ==== %@: %@", traceInfo[@"domain"], info);
+                [durations addObject:@(-1)];
+            } completion:^(NSDictionary * _Nonnull info) {
+                ZAPMLog(@"ping c ==== %@: %@", traceInfo[@"domain"], info);
+                [traceInfo setValue:durations forKey:@"ping"];
+                NSInteger durationValidSum = 0;
+                NSInteger durationValidCount = 0;
+                for (NSNumber *d in durations) {
+                    if (d.integerValue <= 0) {
+                        continue;
+                    }
+                    durationValidSum += d.integerValue;
+                    durationValidCount++;
+                }
+                NSInteger durationAvg = durationValidSum / durationValidCount;
+                [traceInfo setValue:@(durationAvg) forKey:@"pavg"];
+                ZAPMLog(@"ping c ==== %@: %@", traceInfo[@"domain"], [traceInfo yy_modelDescription]);
+                dispatch_semaphore_signal(semaphore);
+            }];
+            
+            // Traceroute
+            ZNDTracerouteConfiguration *tracerouteConfiguration = [[ZNDTracerouteConfiguration alloc] init];
+            tracerouteConfiguration.target = ip;
+            tracerouteConfiguration.maxTTL = 64;
+            tracerouteConfiguration.attempt = 3;
+            tracerouteConfiguration.timeout = 1;
+            __block NSMutableArray *logs = [NSMutableArray array];
+            [[ZNetDiagnosis shared] tracerouteWithConfiguration:tracerouteConfiguration success:^(NSDictionary * _Nonnull info) {
+                ZAPMLog(@"tr s ==== %@: %@", traceInfo[@"domain"], info);
+                ZNDTracerouteICMPReceiveModel *model = [info objectForKey:@"log"];
+                NSMutableString *log = [NSMutableString stringWithFormat:@"%ld\t", model.ttl];
+                NSString *replyIP = [NSString string];
+                for (NSString *rip in model.replyIPs) {
+                    if (rip.length > 0 && [rip containsString:@"*"] == NO) {
+                        replyIP = rip;
+                    }
+                }
+                if (replyIP.length == 0) {
+                    replyIP = @"\t*\t*\t*";
+                }
+                [log appendString:replyIP];
+                for (int index = 0; index < model.durations.count; index++) {
+                    if (model.durations[index].doubleValue != 0) {
+                        NSString *d = [NSString stringWithFormat:@"\t%0.0f ms", (model.durations[index].doubleValue * 1000)];
+                        [log appendString:d];
+                    }
+                }
+                [logs addObject:log];
+            } failure:^(NSDictionary * _Nonnull info) {
+                ZAPMLog(@"tr f ==== %@: %@", traceInfo[@"domain"], info);
+                NSMutableString *log = [NSMutableString stringWithFormat:@"*"];
+                [logs addObject:log];
+            } completion:^(NSDictionary * _Nonnull info) {
+                ZAPMLog(@"tr c ==== %@: %@", traceInfo[@"domain"], info);
+                [traceInfo setValue:logs forKey:@"trace"];
+                if (completion) {
+                    completion(traceInfo);
+                }
+                ZAPMLog(@"tr c ==== %@: %@", traceInfo[@"domain"], [traceInfo yy_modelDescription]);
+                dispatch_semaphore_signal(semaphore);
+            }];
+            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        }
+    });
+}
+
 // MARK: - Ping
 - (void)pingWithConfiguration:(ZNDPingConfiguration *)configuration
                   didComplete:(PingDidComplete)didComplete {

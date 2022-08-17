@@ -22,10 +22,18 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    [self ping];
-    [self traceroute];
-    [self curl];
+//    [self ping];
+//    [self traceroute];
+//    [self curl];
     
+    [self jointTrace];
+}
+
+- (void)jointTrace {
+    [[ZAPMManager shared] traceWithTarget:@[@"github.com", @"google.com"]
+                               completion:^(NSDictionary * _Nonnull info) {
+        NSLog(@"%@", info);
+    }];
 }
 
 - (void)ping {

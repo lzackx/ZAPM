@@ -23,6 +23,9 @@ typedef void(^CURLDidComplete)(NSDictionary *info);
 
 @interface ZAPMManager (Network) <ZcurlManagerDelegate>
 
+- (void)traceWithTarget:(NSArray<NSString *> *)targets
+             completion:(void(^)(NSDictionary *info))completion;
+
 - (void)pingWithConfiguration:(ZNDPingConfiguration *)configuration
                   didComplete:(PingDidComplete)didComplete;
 
